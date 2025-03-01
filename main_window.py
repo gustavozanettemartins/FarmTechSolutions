@@ -120,6 +120,7 @@ class MainWindow(QMainWindow, Ui_FarmTechWindow):
         try:
             qtd_min, qtd_comp = insumo.get('recomendacao_min'), insumo.get('quantidade')
             ha = self.get_ha_area(x, y)
+            print(ha)
             qtd_insumo = qtd_min * ha
             return qtd_insumo / qtd_comp
         except Exception as e:
@@ -159,7 +160,7 @@ class MainWindow(QMainWindow, Ui_FarmTechWindow):
                 for k, v in enumerate(_data_insumos):
                     _insumo = _data.get(re.match(r"\w+", v).group(0).lower())
                     _obj[k][0].setText(re.match(r"\w+", v).group(0).capitalize())
-                    _obj[k][1].setText(_insumo.get("composicao"))
+                    _obj[k][1].setText(f"{_insumo.get('composicao')} ({_insumo.get('quantidade') * 100}%)")
                     _obj[k][2].setText(str(_insumo.get("recomendacao_min")))
                     _obj[k][3].setText(str(round(self.get_insumo_kg(x, y, _insumo), 2)))
 
