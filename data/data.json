@@ -1,0 +1,32 @@
+{
+  "plantas": {
+
+    "milho": {
+      "espacamento_linha": 0.90,
+      "espacamento_planta": 0.80,
+      "cor": "yellow"
+    },
+
+    "soja": {
+      "espacamento_linha": 0.45,
+      "espacamento_planta": 0.075,
+      "cor": "orange"
+    }
+  },
+
+  "insumos": {
+
+    "superfosfato": {
+      "composicao": "P₂O₅",
+      "quantidade": 0.18,
+      "recomendacao_min": 60
+    },
+
+    "ureia": {
+      "composicao": "N",
+      "quantidade": 0.45,
+      "recomendacao_min": 120
+    }
+  }
+
+}
