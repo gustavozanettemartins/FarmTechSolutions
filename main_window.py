@@ -1,8 +1,10 @@
 import sys
 import os
 import math
-from PyQt6.QtCore import QThread, pyqtSignal
+from typing import List
 import json
+import re
+from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QListWidgetItem
 from PyQt6.QtWidgets import QMainWindow
 import numpy as np
@@ -96,8 +98,37 @@ class MainWindow(QMainWindow, Ui_FarmTechWindow):
         except Exception as e:
             print(e)
 
+    def get_list_insumos(self) -> list[str] | None:
+        try:
+            _data = list()
+            total_itens = self.list_insumos.count()
+            for i in range(total_itens):
+                _data.append(self.list_insumos.item(i).text())
+            return _data
+        except Exception as e:
+            print(e)
+
+    @staticmethod
+    def get_ha_area(x, y):
+        try:
+            area = x * y
+            return area/10000
+        except Exception as e:
+            print(e)
+
+    def get_insumo_kg(self, x, y, insumo):
+        try:
+            qtd_min, qtd_comp = insumo.get('recomendacao_min'), insumo.get('quantidade')
+            ha = self.get_ha_area(x, y)
+            qtd_insumo = qtd_min * ha
+            return qtd_insumo / qtd_comp
+        except Exception as e:
+            print(e)
+
     def set_hud(self):
         try:
+            # PARTE 1
+
             self.l_tipo_produto.setText(self.cb_tipo_produto.currentText())
             self.l_comprimento.setText(self.le_comprimento.text())
             self.l_largura.setText(self.le_largura.text())
@@ -115,6 +146,22 @@ class MainWindow(QMainWindow, Ui_FarmTechWindow):
 
             if self.total_plantas > 0:
                 self.l_qtd_plantas.setText(str(self.total_plantas))
+
+            # PARTE 2
+            _data_insumos = self.get_list_insumos()
+            if len(_data_insumos) > 0:
+                _data = load_json(DATA_PATH).get("insumos")
+                print(_data)
+                _obj = {
+                    0: [self.l_insumo_0, self.l_insumo_comp_0, self.l_insumo_min_0, self.l_insumo_qtd_0],
+                    1: [self.l_insumo_1, self.l_insumo_comp_1, self.l_insumo_min_1, self.l_insumo_qtd_1]
+                }
+                for k, v in enumerate(_data_insumos):
+                    _insumo = _data.get(re.match(r"\w+", v).group(0).lower())
+                    _obj[k][0].setText(re.match(r"\w+", v).group(0).capitalize())
+                    _obj[k][1].setText(_insumo.get("composicao"))
+                    _obj[k][2].setText(str(_insumo.get("recomendacao_min")))
+                    _obj[k][3].setText(str(round(self.get_insumo_kg(x, y, _insumo), 2)))
 
         except Exception as e:
             print(e)
