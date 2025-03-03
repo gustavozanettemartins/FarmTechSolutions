@@ -255,7 +255,7 @@ class GraphThread(QThread):
             df.to_csv(
                 f"layout_{self.my_window.cb_tipo_produto.currentText().lower()}_{date_str}.csv",
                 index=False)
-            
+
             print("Arquivo salvo com sucesso.")
         except Exception as e:
             print(e)
@@ -294,9 +294,9 @@ class GraphThread(QThread):
                     x_items = x_items[::factor, ::factor]
                     y_items = y_items[::factor, ::factor]
 
-                # Converte as matrizes 2D subamostradas em um array de pares (x, y)
+                # Converte as matrizes 2D subamostradas em um array de pares (x, y), cada item é um vetor da planta
                 graph_layout_data = np.column_stack((x_items.ravel(), y_items.ravel()))
-
+                
                 if self.my_window.cb_exportar.isChecked():
                     self.export_csv(graph_layout_data)
 
