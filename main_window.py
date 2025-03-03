@@ -118,7 +118,8 @@ class MainWindow(QMainWindow, Ui_FarmTechWindow):
 
     def get_insumo_kg(self, x, y, insumo):
         try:
-            qtd_min, qtd_comp = insumo.get('recomendacao_min'), insumo.get('quantidade')
+            qtd_min, qtd_comp = (insumo.get('recomendacao_min').get(self.cb_tipo_produto.currentText().lower()),
+                                 insumo.get('quantidade'))
             ha = self.get_ha_area(x, y)
             print(ha)
             qtd_insumo = qtd_min * ha
@@ -161,7 +162,9 @@ class MainWindow(QMainWindow, Ui_FarmTechWindow):
                     _insumo = _data.get(re.match(r"\w+", v).group(0).lower())
                     _obj[k][0].setText(re.match(r"\w+", v).group(0).capitalize())
                     _obj[k][1].setText(f"{_insumo.get('composicao')} ({_insumo.get('quantidade') * 100}%)")
-                    _obj[k][2].setText(str(_insumo.get("recomendacao_min")))
+                    _obj[k][2].setText(str(
+                        _insumo.get("recomendacao_min").get(self.cb_tipo_produto.currentText().lower())
+                    ))
                     _obj[k][3].setText(str(round(self.get_insumo_kg(x, y, _insumo), 2)))
 
         except Exception as e:
@@ -250,8 +253,8 @@ class GraphThread(QThread):
                 esp_l = self.data.get("esp_l")  # Espaçamento entre linhas
 
                 # Gera os valores de x e y
-                x_vals = np.arange(1, num_plantas_por_linha + 1) * esp_p
-                y_vals = np.arange(1, num_linhas + 1) * esp_l
+                x_vals = np.arange(0, num_plantas_por_linha + 1) * esp_p
+                y_vals = np.arange(0, num_linhas + 1) * esp_l
 
                 # Cria as matrizes 2D de coordenadas
                 x_items, y_items = np.meshgrid(x_vals, y_vals)  # shapes: (num_linhas, num_plantas_por_linha)
@@ -276,7 +279,7 @@ class GraphThread(QThread):
 
                 # Converte as matrizes 2D subamostradas em um array de pares (x, y)
                 graph_layout_data = np.column_stack((x_items.ravel(), y_items.ravel()))
-
+                print(graph_layout_data[:5])
                 # Se você quiser separar x e y, basta indexar as colunas
                 x_coords, y_coords = graph_layout_data[:, 0], graph_layout_data[:, 1]
 
