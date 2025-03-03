@@ -302,7 +302,7 @@ class GraphThread(QThread):
 
                 # Se você quiser separar x e y, basta indexar as colunas
                 x_coords, y_coords = graph_layout_data[:, 0], graph_layout_data[:, 1]
-
+                # VERIFICAR GRÁFICO SENDO GERADO ERRADO, TALVEZ CÁLCULO DE LINHAS COM PROBLEMA?
                 self.my_window.plotWidget.setXRange(0, self.data.get("comprimento"))
                 self.my_window.plotWidget.setYRange(0, self.data.get("largura"))
                 scatter = pg.ScatterPlotItem(
