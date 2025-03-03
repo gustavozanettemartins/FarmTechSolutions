@@ -7,6 +7,7 @@ import re
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QListWidgetItem
 from PyQt6.QtWidgets import QMainWindow
+import pandas as pd
 import numpy as np
 import pyqtgraph as pg
 from data import *
@@ -280,6 +281,8 @@ class GraphThread(QThread):
                 # Converte as matrizes 2D subamostradas em um array de pares (x, y)
                 graph_layout_data = np.column_stack((x_items.ravel(), y_items.ravel()))
                 print(graph_layout_data[:5])
+                df = pd.DataFrame(graph_layout_data, columns=["x", "y"])
+                print(df)
                 # Se você quiser separar x e y, basta indexar as colunas
                 x_coords, y_coords = graph_layout_data[:, 0], graph_layout_data[:, 1]
 
