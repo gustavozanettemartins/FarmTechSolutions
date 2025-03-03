@@ -17,9 +17,6 @@ from utils import *
 DATA_PATH = "data/data.json"
 
 
-# Efetuar mudança no cálculo para que ele coloque vetores também na linha 0, só está começando após o 0
-
-
 class MainWindow(QMainWindow, Ui_FarmTechWindow):
     def __init__(self):
         super().__init__()
