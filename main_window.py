@@ -1,6 +1,7 @@
 import sys
 import os
 import math
+from operator import index
 from typing import List
 import json
 import re
@@ -244,6 +245,21 @@ class GraphThread(QThread):
         self.my_window = _window
         self.data = _data
 
+    def export_csv(self, _data):
+        from datetime import datetime
+
+        try:
+            df = pd.DataFrame(_data, columns=["x", "y"], index=range(len(_data)))
+            df['linha'] = df['y'].astype('category').cat.codes + 1
+            date_str = datetime.now().strftime('%Y%m%d%H%M%S')
+            df.to_csv(
+                f"layout_{self.my_window.cb_tipo_produto.currentText().lower()}_{date_str}.csv",
+                index=False)
+            
+            print("Arquivo salvo com sucesso.")
+        except Exception as e:
+            print(e)
+
     def run(self):
         try:
             if self.my_window.plotWidget is not None:
@@ -280,9 +296,10 @@ class GraphThread(QThread):
 
                 # Converte as matrizes 2D subamostradas em um array de pares (x, y)
                 graph_layout_data = np.column_stack((x_items.ravel(), y_items.ravel()))
-                print(graph_layout_data[:5])
-                df = pd.DataFrame(graph_layout_data, columns=["x", "y"])
-                print(df)
+
+                if self.my_window.cb_exportar.isChecked():
+                    self.export_csv(graph_layout_data)
+
                 # Se você quiser separar x e y, basta indexar as colunas
                 x_coords, y_coords = graph_layout_data[:, 0], graph_layout_data[:, 1]
 
