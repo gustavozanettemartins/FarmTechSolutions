@@ -1,5 +1,3 @@
-PyQt6
-pyqtgraph
 pandas
 numpy
 requests
