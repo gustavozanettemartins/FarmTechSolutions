@@ -293,6 +293,7 @@ class GraphThread(QThread):
 
                 # Converte as matrizes 2D subamostradas em um array de pares (x, y), cada item é um vetor da planta
                 graph_layout_data = np.column_stack((x_items.ravel(), y_items.ravel()))
+                print(graph_layout_data)
                 
                 if self.my_window.cb_exportar.isChecked():
                     self.export_csv(graph_layout_data)
