@@ -1,4 +1,4 @@
-__all__ = ['load_json', 'save_json', 'update_json']
+__all__ = ['load_json', 'save_json', 'update_json', 'extract_numbers']
 
 import json
 
@@ -41,3 +41,12 @@ def update_json(path: str, new_data: dict):
 
     except FileNotFoundError:
         raise ValueError("Path não encontrado.")
+
+def extract_numbers(text: str):
+    import re
+
+    try:
+        return re.sub(r'\D', '', text)
+
+    except Exception as e:
+        print(e)
