@@ -1,4 +1,4 @@
-__all__ = ['DATA', 'update_data', 'adicionar_planta', 'remover_planta']
+__all__ = ['get_data', 'update_data', 'adicionar_planta', 'remover_planta']
 
 import os
 from typing import Dict
@@ -9,6 +9,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, 'data.json')
 DATA = load_json(DATA_PATH)
 
+def get_data() -> dict:
+    try:
+        return DATA
+    except Exception as e:
+        print(e)
+        return dict()
 
 def update_data() -> Dict[str, Dict[str, int]]:
     try:
@@ -19,18 +25,18 @@ def update_data() -> Dict[str, Dict[str, int]]:
 
 
 def adicionar_planta(name: str, values: Dict):
-    """Adiciona uma nova planta ao JSON.
+    """
+    Adiciona uma nova planta.
 
     :param name: Nome da planta.
     :param values: Dicionário contendo os dados da planta("esp_linha": float,
     "esp_planta": float, "tipo_figura_geom": list).
+    :return: None
     """
     try:
         if isinstance(name, str):
             if name not in DATA.get("plantas"):
                 DATA["plantas"][name] = values
-                print(f"✅ Planta '{name}' adicionada com sucesso!")
-                print(DATA)
             else:
                 raise ValueError(f"Planta: {name} já existe!")
         else:
@@ -40,16 +46,21 @@ def adicionar_planta(name: str, values: Dict):
         print(e)
 
 
-def remover_planta(nome: str):
-    try:
-        """Remove uma planta do JSON."""
-        data = load_json(DATA_PATH)
+def remover_planta(name: str):
+    """
+    Deleta uma planta.
 
-        if "plantas" in data and nome in data["plantas"]:
-            del data["plantas"][nome]  # Remove a planta
-            save_json(DATA_PATH, data)  # Salva as alterações
-            print(f"❌ Planta '{nome}' removida com sucesso!")
+    :param name: Nome da planta.
+    :return: None
+    """
+    try:
+        if isinstance(name, str):
+            if name in DATA.get("plantas"):
+                del DATA["plantas"][name]
+            else:
+                raise ValueError(f"Planta: {name} não existe!")
         else:
-            print(f"⚠️ Planta '{nome}' não encontrada.")
+            raise ValueError(f"Planta: '{name}' precisa ser do tipo str!")
+
     except Exception as e:
         print(e)
