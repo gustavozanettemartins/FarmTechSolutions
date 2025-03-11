@@ -4,8 +4,11 @@ from data import get_data, remover_planta, update_data
 def add_planta():
     from data import adicionar_planta
 
-    name = input("Digite o nome da planta: ")
-    values = dict()
+    name = input("Digite o nome da planta: ").lower()
+    esp_linhas = input("Digite o espaçamento entre linhas: ")
+    esp_plantas = input("Digite o espaçamento entre plantas: ")
+    tipo_figura_geom = input("Digite o tipo de figura geométrica: ")
+    values = {"esp_linhas": esp_linhas, "esp_plantas": esp_plantas, "tipo_figura_geom": [tipo_figura_geom]}
 
     try:
         adicionar_planta(name, values)
@@ -14,8 +17,6 @@ def add_planta():
         print(e)
 
 def rm_planta():
-    from data import adicionar_planta
-
     name = input("Digite o nome da planta: ").lower()
 
     try:
