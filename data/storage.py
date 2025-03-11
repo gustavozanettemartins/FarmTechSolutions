@@ -18,13 +18,15 @@ def get_data() -> dict:
 
 def update_data() -> Dict[str, Dict[str, int]]:
     try:
+        print(f"Dados Salvos em {DATA_PATH}")
         return save_json(DATA_PATH, DATA)
+
     except Exception as e:
         print(e)
         return dict()
 
 
-def adicionar_planta(name: str, values: Dict):
+def adicionar_planta(name: str, values: dict):
     """
     Adiciona uma nova planta.
 
