@@ -1,11 +1,8 @@
 from data import *
-from utils import *
+
 
 def main():
-    _data = get_data()
-    print(_data, type(_data))
-    _data["teste"] = {"a": 0}
-    print(update_data(_data))
+    adicionar_planta("Melancia", {"esp_planta": 0.9, "esp_linha": 0.8, "tipo_figura_geom": ["quadrado"]})
 
 
 if __name__ == '__main__':

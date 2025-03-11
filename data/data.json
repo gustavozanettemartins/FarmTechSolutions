@@ -1,8 +1,8 @@
 {
     "plantas": {
         "milho": {
-            "espacamento_linha": 0.9,
-            "espacamento_planta": 0.8,
+            "esp_linha": 0.9,
+            "esp_planta": 0.8,
             "cor": "yellow",
             "tipo_figura_geom": [
                 "quadrado",
@@ -10,8 +10,8 @@
             ]
         },
         "soja": {
-            "espacamento_linha": 0.45,
-            "espacamento_planta": 0.16,
+            "esp_linha": 0.45,
+            "esp_planta": 0.16,
             "cor": "orange",
             "tipo_figura_geom": [
                 "quadrado",
@@ -21,17 +21,17 @@
     },
     "insumos": {
         "superfosfato": {
-            "composicao": "P₂O₅",
+            "comp": "P₂O₅",
             "quantidade": 0.18,
-            "recomendacao_min": {
+            "min": {
                 "milho": 60,
                 "soja": 50
             }
         },
         "ureia": {
-            "composicao": "N",
+            "comp": "N",
             "quantidade": 0.45,
-            "recomendacao_min": {
+            "min": {
                 "milho": 120,
                 "soja": 20
             }
