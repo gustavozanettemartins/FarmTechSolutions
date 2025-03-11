@@ -1,4 +1,4 @@
-__all__ = ['load_json', ]
+__all__ = ['load_json', 'save_json', 'update_json']
 
 import json
 
@@ -14,8 +14,14 @@ def load_json(path: str):
 
 def save_json(path: str, data: dict):
     """Salva os dados no arquivo JSON."""
-    with open(path, "w", encoding="utf-8") as arquivo:
-        json.dump(data, arquivo, indent=4, ensure_ascii=False)
+    try:
+        with open(path, "w", encoding="utf-8") as arquivo:
+            json.dump(data, arquivo, indent=4, ensure_ascii=False)
+
+        return data
+    except Exception as e:
+        print(e)
+
 
 def update_json(path: str, new_data: dict):
     """
@@ -25,11 +31,13 @@ def update_json(path: str, new_data: dict):
     :param new_data: Dicionário com os novos dados a serem adicionados/modificados.
     """
     try:
-        data = load_json(path)  # Carregar os dados existentes
+        data = load_json(path)
     except FileNotFoundError:
-        data = {}  # Se não existir, cria um dicionário vazio
+        data = {}
 
-    # Mescla os novos dados com os antigos
-    data.update(new_data)
+    try:
+        data.update(new_data)
+        save_json(path, data)
 
-    save_json(path, data)  # Salva as alterações
+    except FileNotFoundError:
+        raise ValueError("Path não encontrado.")

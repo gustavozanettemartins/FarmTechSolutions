@@ -1,40 +1,43 @@
 {
-  "plantas": {
-
-    "milho": {
-      "espacamento_linha": 0.90,
-      "espacamento_planta": 0.80,
-      "cor": "yellow",
-      "tipo_figura_geom": ["quadrado", "retângulo"]
+    "plantas": {
+        "milho": {
+            "espacamento_linha": 0.9,
+            "espacamento_planta": 0.8,
+            "cor": "yellow",
+            "tipo_figura_geom": [
+                "quadrado",
+                "retângulo"
+            ]
+        },
+        "soja": {
+            "espacamento_linha": 0.45,
+            "espacamento_planta": 0.16,
+            "cor": "orange",
+            "tipo_figura_geom": [
+                "quadrado",
+                "retângulo"
+            ]
+        }
     },
-
-    "soja": {
-      "espacamento_linha": 0.45,
-      "espacamento_planta": 0.16,
-      "cor": "orange",
-      "tipo_figura_geom": ["quadrado", "retângulo"]
-    }
-  },
-
-  "insumos": {
-
-    "superfosfato": {
-      "composicao": "P₂O₅",
-      "quantidade": 0.18,
-      "recomendacao_min": {
-        "milho": 60,
-        "soja": 50
-      }
+    "insumos": {
+        "superfosfato": {
+            "composicao": "P₂O₅",
+            "quantidade": 0.18,
+            "recomendacao_min": {
+                "milho": 60,
+                "soja": 50
+            }
+        },
+        "ureia": {
+            "composicao": "N",
+            "quantidade": 0.45,
+            "recomendacao_min": {
+                "milho": 120,
+                "soja": 20
+            }
+        }
     },
-
-    "ureia": {
-      "composicao": "N",
-      "quantidade": 0.45,
-      "recomendacao_min": {
-        "milho": 120,
-        "soja": 20
-      }
+    "teste": {
+        "a": 0
     }
-  }
-
 }
