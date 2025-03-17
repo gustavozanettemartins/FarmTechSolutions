@@ -1,5 +1,4 @@
 import os
-import math
 from time import sleep
 from datetime import datetime
 from data import get_data, remover_planta, update_data
