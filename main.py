@@ -572,13 +572,41 @@ def iniciar_calc():
 
         INSUMOS_SELECIONADOS = insumos
         get_vetores()
-
+        get_info_registro()
     except Exception as e:
         print(e)
         sleep(1)
 
+def get_info_registro():
+    try:
+        limpar_tela()
+        print("----------- INSUMOS UTILIZADOS ------------")
+        custo_total = 0
+        for k, v in INSUMOS_DATA.items():
+            print(f"\n--> {k} <--")
+            print(f"kg/ha: {v["kg/ha"]}")
+            print(f"mL/m: {v["ml_por_metro_linear (mL/m)"]}")
+            print(f"Custo: R$ {v["custo"]:.2f}")
+            custo_total += v["custo"]
+
+        print("\n----------- INFO CÁLCULO ------------")
+        print(f"Base: {BASE} m")
+        print(f"Altura: {ALTURA} m")
+        print(f"Área: {BASE * ALTURA} m2")
+        print(f"Quantidade de ruas: {NUM_LINHAS}")
+        print(f"Quantidade de plantas por rua: {NUM_PLANTAS_LINHA}")
+        print(f"Quantidade de plantas total: {QTD_PLANTAS}")
+        print(f"Custo Total: R$ {custo_total:.2f}")
+
+        input("\nPressione Enter para continuar...")
+    except Exception as e:
+        print(e)
+
 def select_registros():
     try:
+        limpar_tela()
+        print("\n----------- REGISTROS ------------")
+        print(f"")
         print(REGISTROS)
         print(NUM_LINHAS, NUM_PLANTAS_LINHA)
         input("\nPressione Enter para continuar...")
