@@ -1,7 +1,15 @@
 import os
+import math
 from time import sleep
+from datetime import datetime
 from data import get_data, remover_planta, update_data
 from utils import extract_numbers
+import numpy as np
+
+REGISTROS = {}
+BASE, ALTURA = 0, 0
+PLANTA_SELECIONADA = None
+INSUMOS_SELECIONADOS = list()
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -107,7 +115,7 @@ def edit_planta(name: str, planta: dict):
             print(e)
             sleep(1)
 
-def select_planta(show_info=False):
+def select_planta(show_info=False, get_planta=False):
     try:
         while True:
             limpar_tela()
@@ -124,10 +132,12 @@ def select_planta(show_info=False):
                 return
             response = int(extract_numbers(response)) - 1
             if 0 <= response < len(plantas):
-                if not show_info:
+                if not show_info and not get_planta:
                     edit_planta(plantas[response], get_data().get("plantas").get(plantas[response]))
                 else:
                     name = plantas[response]
+                    if get_planta:
+                        return name
                     planta = get_data().get("plantas").get(plantas[response])
                     print(f"\n1. Nome: {name}\n"
                           f"2. Espaçamento entre linhas: {planta.get('esp_linha')}\n"
@@ -316,7 +326,7 @@ def edit_insumo(name: str, insumo: dict):
             print(e)
             sleep(1)
 
-def select_insumo(show_info=False):
+def select_insumo(show_info=False, get_insumo=False):
     try:
         while True:
             limpar_tela()
@@ -333,10 +343,12 @@ def select_insumo(show_info=False):
                 return
             response = int(extract_numbers(response)) - 1
             if 0 <= response < len(insumos):
-                if not show_info:
+                if not show_info and not get_insumo:
                     edit_insumo(insumos[response], get_data().get("insumos").get(insumos[response]))
                 else:
                     name = insumos[response]
+                    if get_insumo:
+                        return name
                     insumo = get_data().get("insumos").get(insumos[response])
                     print(f"\n1. Nome: {name}\n"
                           f"2. Composição: {insumo.get('comp')}\n"
@@ -384,22 +396,138 @@ def insumos_menu():
             print(e)
             sleep(1)
 
+def get_ha_area(x, y):
+    try:
+        area = x * y
+        return area / 10000
+
+    except Exception as e:
+        print(e)
+
+def get_insumo_kg(x, y, planta, insumo_name):
+    try:
+        insumo = get_data().get("insumos").get(insumo_name)
+        qtd_min, qtd_comp = insumo.get("min").get(planta), insumo.get("quantidade")
+        ha = get_ha_area(x, y)
+        qtd_insumo = qtd_min * ha
+
+        return qtd_insumo / qtd_comp
+    except Exception as e:
+        print(e)
+
+def add_registro(_data):
+    global REGISTROS
+
+    try:
+        if len(REGISTROS) == 0:
+            REGISTROS[PLANTA_SELECIONADA] = {0: {"time": datetime.now(), "data": _data}}
+        else:
+            if not REGISTROS.get(PLANTA_SELECIONADA):
+                REGISTROS[PLANTA_SELECIONADA] = {0: {"time": datetime.now(), "data": _data}}
+            else:
+                REGISTROS[PLANTA_SELECIONADA][len(REGISTROS[PLANTA_SELECIONADA])] = {
+                    "time": datetime.now(), "data": _data
+                }
+    except Exception as e:
+        print(e)
+
+def get_vetores():
+
+
+    try:
+        if PLANTA_SELECIONADA and BASE > 0 and ALTURA > 0:
+            _data = get_data().get("plantas").get(PLANTA_SELECIONADA)
+            esp_l, esp_p = _data.get("esp_linha"), _data.get("esp_planta")
+
+            num_linhas = int(ALTURA // esp_l)
+            num_plantas_por_linha = int(BASE // esp_p)
+            x_vals = np.arange(0, num_plantas_por_linha + 1) * esp_p
+            y_vals = np.arange(0, num_linhas + 1) * esp_l
+
+            x_items, y_items = np.meshgrid(x_vals, y_vals)  # shapes: (num_linhas, num_plantas_por_linha)
+
+            graph_layout_data = np.column_stack((x_items.ravel(), y_items.ravel()))
+            add_registro(graph_layout_data)
+    except Exception as e:
+        print(e)
+
+def iniciar_calc():
+    try:
+        global BASE, ALTURA, PLANTA_SELECIONADA, INSUMOS_SELECIONADOS
+
+        limpar_tela()
+        print(f"\n----INICIAR CÁLCULO--------------------\n")
+
+        base = input("Digite a base (m): ")
+        if extract_numbers(base).replace(' ', '').isdigit():
+            if abs(float(base)) > 0:
+                BASE = abs(float(base))
+            else:
+                raise ValueError("Base precisa ser maior que 0")
+        else:
+            raise ValueError("Base precisa ser um número")
+
+        altura = input("Digite a altura (m): ")
+        if extract_numbers(altura).replace(' ', '').isdigit():
+            if abs(float(altura)) > 0:
+                ALTURA = abs(float(altura))
+            else:
+                raise ValueError("Altura precisa ser maior que 0")
+        else:
+            raise ValueError("Altura precisa ser um número")
+
+        PLANTA_SELECIONADA = select_planta(get_planta=True)
+        if PLANTA_SELECIONADA is None:
+            raise ValueError("Planta precisa ser selecionada")
+        insumos = list()
+
+        while True:
+            insumo = select_insumo(get_insumo=True)
+            if insumo not in insumos and insumo is not None:
+                insumos.append(insumo)
+            limpar_tela()
+            if len(insumos) < len(get_data().get("insumos")):
+                print(f"\n------> Insumos Adicionados: {insumos} <--------")
+                print("\nAdicionar mais insumos?\n\n1. Sim\n0. Não\n")
+                response = input("Digite a opção: ")
+                if response == "0":
+                    break
+            else:
+                break
+
+        get_vetores()
+        input("\nPressione Enter para continuar...")
+
+    except Exception as e:
+        print(e)
+        sleep(1)
+
+def select_registros():
+    try:
+        print(REGISTROS)
+        sleep(5)
+    except Exception as e:
+        print(e)
+
 def layout_menu():
     from utils import extract_numbers
 
     while True:
         try:
             limpar_tela()
-            print(f"\n----MENU CÁLCULO--------------------\n1. Iniciar\n0. Voltar")
+            print(f"\n----MENU CÁLCULO--------------------\n\n1. Iniciar")
+            if len(REGISTROS) > 0:
+                print(f"2. Resultados Anteriores")
+            print(f"0. Voltar\n")
             response = input("Digite a opção: ")
 
             if extract_numbers(response).replace(' ', '') != "":
                 option = extract_numbers(response).replace(' ', '')
 
                 if option == "1":
-                    ...
-                elif option == "2":
-                    ...
+                    iniciar_calc()
+                elif option == "2" and len(REGISTROS) > 0:
+                    select_registros()
                 elif option == "0":
                     break
             else:
