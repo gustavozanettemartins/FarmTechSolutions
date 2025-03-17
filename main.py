@@ -196,6 +196,7 @@ def add_insumo():
 
     comp = input("Digite a composição: ")
     quantidade = input("Digite a quantidade (%) em número decimal: ")
+    densidade = input("Digite a densidade: ")
     input_values = input("Digite o nome da planta e a recomendação mínima entre vírgula. Ex: milho, 60: ")
     input_values = input_values.split(", ")
 
@@ -209,6 +210,7 @@ def add_insumo():
         values = {
             "comp": comp,
             "quantidade": quantidade,
+            "densidade": densidade,
             "min": {input_values[0]: float(extract_numbers(input_values[1]))}
         }
 
@@ -260,7 +262,8 @@ def edit_insumo(name: str, insumo: dict):
             print(f"1. Nome: {name}\n"
                   f"2. Composição: {insumo.get('comp')}\n"
                   f"3. Quantidade (%): {insumo.get('quantidade')}\n"
-                  f"4. Recomendação Mínima (kg/ha): {insumo.get('min')}")
+                  f"4. Densidade: {insumo.get('densidade')}\n"
+                  f"5. Recomendação Mínima (kg/ha): {insumo.get('min')}")
             print(f"0. Voltar\n")
             response = input("Digite a opção: ")
 
@@ -294,6 +297,13 @@ def edit_insumo(name: str, insumo: dict):
                     raise ValueError("Precisa ser um número")
 
             elif response == "4":
+                value = input(f"Densidade: ")
+                if extract_numbers(value).replace(" ", "").isnumeric():
+                    insumo["densidade"] = float(extract_numbers(value))
+                else:
+                    raise ValueError("Precisa ser um número")
+
+            elif response == "5":
                 try:
                     while True:
                         limpar_tela()
@@ -354,7 +364,8 @@ def select_insumo(show_info=False, get_insumo=False):
                     print(f"\n1. Nome: {name}\n"
                           f"2. Composição: {insumo.get('comp')}\n"
                           f"3. Quantidade (%): {insumo.get('quantidade')}\n"
-                          f"4. Recomendação Mínima (kg/ha): {insumo.get('min')}")
+                          f"4. Densidade: {insumo.get('densidade')}\n"
+                          f"5. Recomendação Mínima (kg/ha): {insumo.get('min')}")
                     input("\nPressione Enter para continuar...")
             else:
                 print("Opção inválida!")
