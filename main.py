@@ -10,7 +10,7 @@ BASE, ALTURA = 0, 0
 PLANTA_SELECIONADA = None
 INSUMOS_SELECIONADOS = list()
 INSUMOS_DATA = dict()
-NUM_LINHAS, NUM_PLANTAS_LINHA = 0, 0
+NUM_LINHAS, NUM_PLANTAS_LINHA, QTD_PLANTAS = 0, 0, 0
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -423,36 +423,39 @@ def converter_g_m_para_ml_m(fertilizante_g_m, densidade_g_ml):
     :param densidade_g_ml: Densidade do fertilizante em gramas por mililitro (g/mL).
     :return: Quantidade de fertilizante em mililitros por metro linear (mL/m).
     """
-    if densidade_g_ml > 0:
-        return fertilizante_g_m / densidade_g_ml
-    else:
-        return 0
+    return fertilizante_g_m / densidade_g_ml if densidade_g_ml > 0 else 0
 
 def calcular_fertilizante_por_metro():
-    global INSUMOS_DATA
+    global INSUMOS_DATA, QTD_PLANTAS
 
     try:
+        insumos = get_data().get("insumos", {})
         for k, v in INSUMOS_DATA.items():
-            fertilizante_g = v["kg/ha"] * 1000
+            kg_ha = v.get("kg/ha", 0)
+            densidade = insumos.get(k, {}).get("densidade", 1)
+            fertilizante_g = (kg_ha * 1000)
             total_plantas = NUM_LINHAS * NUM_PLANTAS_LINHA
+            QTD_PLANTAS = total_plantas
+
             if total_plantas > 0:
                 fertilizante_por_planta = fertilizante_g / total_plantas
             else:
                 fertilizante_por_planta = 0
+
             comprimento_total_linhas = NUM_LINHAS * ALTURA
+
             if comprimento_total_linhas > 0:
                 fertilizante_por_metro_linear = fertilizante_g / comprimento_total_linhas
             else:
                 fertilizante_por_metro_linear = 0
 
-            INSUMOS_DATA[k]["g_por_planta (g)"] = fertilizante_por_planta
-            INSUMOS_DATA[k]["g_por_metro_linear (g/m)"] = fertilizante_por_metro_linear
-            INSUMOS_DATA[k]["ml_por_metro_linear (mL/m)"] = converter_g_m_para_ml_m(
-                fertilizante_por_metro_linear, get_data().get("insumos").get(k).get("densidade")
-            )
+            ml_por_metro = converter_g_m_para_ml_m(fertilizante_por_metro_linear, densidade)
+            INSUMOS_DATA[k]["g_por_planta (g)"] = round(fertilizante_por_planta, 2)
+            INSUMOS_DATA[k]["g_por_metro_linear (g/m)"] = round(fertilizante_por_metro_linear, 2)
+            INSUMOS_DATA[k]["ml_por_metro_linear (mL/m)"] = round(ml_por_metro, 2)
+
     except Exception as e:
-        print(e)
-        sleep(1)
+        print(f"Erro ao calcular fertilizante por metro: {e}")
 
 def get_insumo_kg():
     global INSUMOS_DATA
@@ -462,11 +465,12 @@ def get_insumo_kg():
             data = dict()
             for i in INSUMOS_SELECIONADOS:
                 insumo = get_data().get("insumos").get(i)
+                custo = insumo.get("custo")
                 qtd_min, qtd_comp = insumo.get("min").get(PLANTA_SELECIONADA), insumo.get("quantidade")
                 ha = get_ha_area(BASE, ALTURA)
                 qtd_insumo = qtd_min * ha
-
-                data[i] = {"kg/ha": qtd_insumo / qtd_comp}
+                value = round(qtd_insumo / qtd_comp, 2)
+                data[i] = {"kg/ha": value, "custo": round(value*custo, 2)}
 
             INSUMOS_DATA = data
             calcular_fertilizante_por_metro()
@@ -572,8 +576,13 @@ def select_registros():
 
 def get_globals():
     try:
-        print(BASE, ALTURA, PLANTA_SELECIONADA, INSUMOS_SELECIONADOS, INSUMOS_DATA, NUM_LINHAS, NUM_PLANTAS_LINHA)
+        print(BASE, ALTURA, PLANTA_SELECIONADA, INSUMOS_SELECIONADOS, INSUMOS_DATA, NUM_LINHAS, NUM_PLANTAS_LINHA,
+              QTD_PLANTAS)
         calcular_fertilizante_por_metro()
+        for k, v  in INSUMOS_DATA.items():
+            print(v["ml_por_metro_linear (mL/m)"] * QTD_PLANTAS)
+            sleep(1)
+
         input("\nPressione Enter para continuar...")
     except Exception as e:
         print(e)

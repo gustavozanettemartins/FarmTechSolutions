@@ -16,6 +16,7 @@
             "comp": "P₂O₅",
             "quantidade": 0.18,
             "densidade": 1.6,
+            "custo": 11.56,
             "min": {
                 "milho": 60,
                 "soja": 50
@@ -25,6 +26,7 @@
             "comp": "N",
             "quantidade": 0.45,
             "densidade": 1.32,
+            "custo": 2.1,
             "min": {
                 "milho": 120,
                 "soja": 20
