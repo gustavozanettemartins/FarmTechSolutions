@@ -432,8 +432,6 @@ def add_registro(_data):
         print(e)
 
 def get_vetores():
-
-
     try:
         if PLANTA_SELECIONADA and BASE > 0 and ALTURA > 0:
             _data = get_data().get("plantas").get(PLANTA_SELECIONADA)
