@@ -3,20 +3,12 @@
         "milho": {
             "esp_linha": 0.9,
             "esp_planta": 0.8,
-            "cor": "yellow",
-            "tipo_figura_geom": [
-                "quadrado",
-                "retângulo"
-            ]
+            "tipo_figura_geom": "quadrado"
         },
         "soja": {
             "esp_linha": 0.45,
             "esp_planta": 0.16,
-            "cor": "orange",
-            "tipo_figura_geom": [
-                "quadrado",
-                "retângulo"
-            ]
+            "tipo_figura_geom": "quadrado"
         }
     },
     "insumos": {

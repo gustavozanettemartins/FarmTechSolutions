@@ -1,4 +1,5 @@
-__all__ = ['get_data', 'update_data', 'adicionar_planta', 'remover_planta']
+__all__ = ['get_data', 'update_data', 'adicionar_planta', 'remover_planta', 'editar_planta', 'adicionar_insumo',
+           'remover_insumo', 'editar_insumo']
 
 import os
 from typing import Dict
@@ -18,7 +19,6 @@ def get_data() -> dict:
 
 def update_data() -> Dict[str, Dict[str, int]]:
     try:
-        print(f"Dados Salvos em {DATA_PATH}")
         return save_json(DATA_PATH, DATA)
 
     except Exception as e:
@@ -64,5 +64,72 @@ def remover_planta(name: str):
         else:
             raise ValueError(f"Planta: '{name}' precisa ser do tipo str!")
 
+    except Exception as e:
+        print(e)
+
+def editar_planta(name: str, values: dict):
+    """
+        Edita uma planta.
+
+        :param name: Nome da planta.
+        :param values: Dicionário contendo os dados da planta a serem modificados.
+        :return: None
+        """
+    try:
+        print(name, values)
+    except Exception as e:
+        print(e)
+
+def adicionar_insumo(name: str, values: dict):
+    """
+    Adiciona um novo insumo.
+
+    :param name: Nome do insumo.
+    :param values: Dicionário contendo os dados do insumo("comp": str,
+    "quantidade": float, "min": dict).
+    :return: None
+    """
+    try:
+        if isinstance(name, str):
+            if name not in DATA.get("insumos"):
+                DATA["insumos"][name] = values
+            else:
+                raise ValueError(f"Insumo: {name} já existe!")
+        else:
+            raise ValueError(f"Insumo: '{name}' precisa ser do tipo str!")
+
+    except Exception as e:
+        print(e)
+
+
+def remover_insumo(name: str):
+    """
+    Deleta um insumo.
+
+    :param name: Nome do insumo.
+    :return: None
+    """
+    try:
+        if isinstance(name, str):
+            if name in DATA.get("insumos"):
+                del DATA["insumos"][name]
+            else:
+                raise ValueError(f"Insumo: {name} não existe!")
+        else:
+            raise ValueError(f"Insumo: '{name}' precisa ser do tipo str!")
+
+    except Exception as e:
+        print(e)
+
+def editar_insumo(name: str, values: dict):
+    """
+        Edita um insumo.
+
+        :param name: Nome do insumo.
+        :param values: Dicionário contendo os dados do insumo a serem modificados.
+        :return: None
+        """
+    try:
+        print(name, values)
     except Exception as e:
         print(e)
