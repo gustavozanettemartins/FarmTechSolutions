@@ -39,8 +39,14 @@ def rm_planta():
         if response == "0":
             return
 
-        name = plantas[int(extract_numbers(response))]
-        remover_planta(name)
+        response = int(extract_numbers(response)) - 1
+        name = plantas[response]
+
+        if 0 <= response < len(plantas):
+            remover_planta(name)
+        else:
+            print("Opção inválida!")
+            sleep(1)
 
     except Exception as e:
         print(e)
@@ -170,10 +176,65 @@ def plantas_menu():
             sleep(1)
 
 def add_insumo():
-    ...
+    from data import adicionar_insumo
+
+    name = input("Digite o nome do insumo, ou 0 para voltar: ").lower()
+
+    if name == "0":
+        return
+
+    comp = input("Digite a composição: ")
+    quantidade = input("Digite a quantidade (%) em número decimal: ")
+    input_values = input("Digite o nome da planta e a recomendação mínima entre vírgula. Ex: milho, 60: ")
+    input_values = input_values.split(", ")
+
+    if len(input_values) > 2:
+        raise ValueError("Formato recomendação mínima errado!")
+
+    elif not extract_numbers(input_values[1]).replace(" ", "").isnumeric():
+        raise ValueError("Valor precisa ser um número!")
+
+    else:
+        values = {
+            "comp": comp,
+            "quantidade": quantidade,
+            "min": {input_values[0]: float(extract_numbers(input_values[1]))}
+        }
+
+    try:
+        adicionar_insumo(name, values)
+
+    except Exception as e:
+        print(e)
+        sleep(1)
 
 def rm_insumo():
-    ...
+    from data import remover_insumo
+
+    try:
+        print(f"\n----REMOVER INSUMO--------------------\n")
+
+        insumos = [k for k in get_data().get("insumos")]
+        for i in range(len(insumos)):
+            print(f"{i + 1}. {insumos[i]}")
+        print(f"0. Voltar")
+
+        response = input("Digite a opção: ")
+
+        if response == "0":
+            return
+
+        response = int(extract_numbers(response)) - 1
+        name = insumos[response]
+
+        if 0 <= response < len(insumos):
+            remover_insumo(name)
+        else:
+            print("Opção inválida!")
+            sleep(1)
+
+    except Exception as e:
+        print(e)
 
 def edit_insumo(name: str, insumo: dict):
     while True:
