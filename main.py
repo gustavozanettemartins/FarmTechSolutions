@@ -10,6 +10,8 @@ REGISTROS = {}
 BASE, ALTURA = 0, 0
 PLANTA_SELECIONADA = None
 INSUMOS_SELECIONADOS = list()
+INSUMOS_DATA = dict()
+NUM_LINHAS, NUM_PLANTAS_LINHA = 0, 0
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -404,16 +406,63 @@ def get_ha_area(x, y):
     except Exception as e:
         print(e)
 
-def get_insumo_kg(x, y, planta, insumo_name):
-    try:
-        insumo = get_data().get("insumos").get(insumo_name)
-        qtd_min, qtd_comp = insumo.get("min").get(planta), insumo.get("quantidade")
-        ha = get_ha_area(x, y)
-        qtd_insumo = qtd_min * ha
+def converter_g_m_para_ml_m(fertilizante_g_m, densidade_g_ml):
+    """
+    Converte a quantidade de fertilizante de g/m para ml/m.
+    :param fertilizante_g_m: Quantidade de fertilizante em gramas por metro linear (g/m).
+    :param densidade_g_ml: Densidade do fertilizante em gramas por mililitro (g/mL).
+    :return: Quantidade de fertilizante em mililitros por metro linear (mL/m).
+    """
+    if densidade_g_ml > 0:
+        return fertilizante_g_m / densidade_g_ml
+    else:
+        return 0
 
-        return qtd_insumo / qtd_comp
+def calcular_fertilizante_por_metro():
+    global INSUMOS_DATA
+
+    try:
+        for k, v in INSUMOS_DATA.items():
+            fertilizante_g = v["kg/ha"] * 1000
+            total_plantas = NUM_LINHAS * NUM_PLANTAS_LINHA
+            if total_plantas > 0:
+                fertilizante_por_planta = fertilizante_g / total_plantas
+            else:
+                fertilizante_por_planta = 0
+            comprimento_total_linhas = NUM_LINHAS * ALTURA
+            if comprimento_total_linhas > 0:
+                fertilizante_por_metro_linear = fertilizante_g / comprimento_total_linhas
+            else:
+                fertilizante_por_metro_linear = 0
+
+            INSUMOS_DATA[k]["g_por_planta (g)"] = fertilizante_por_planta
+            INSUMOS_DATA[k]["g_por_metro_linear (g/m)"] = fertilizante_por_metro_linear
+            INSUMOS_DATA[k]["ml_por_metro_linear (mL/m)"] = converter_g_m_para_ml_m(
+                fertilizante_por_metro_linear, get_data().get("insumos").get(k).get("densidade")
+            )
     except Exception as e:
         print(e)
+        sleep(1)
+
+def get_insumo_kg():
+    global INSUMOS_DATA
+
+    try:
+        if BASE > 0 and ALTURA > 0 and PLANTA_SELECIONADA is not None and len(INSUMOS_SELECIONADOS) > 0:
+            data = dict()
+            for i in INSUMOS_SELECIONADOS:
+                insumo = get_data().get("insumos").get(i)
+                qtd_min, qtd_comp = insumo.get("min").get(PLANTA_SELECIONADA), insumo.get("quantidade")
+                ha = get_ha_area(BASE, ALTURA)
+                qtd_insumo = qtd_min * ha
+
+                data[i] = {"kg/ha": qtd_insumo / qtd_comp}
+
+            INSUMOS_DATA = data
+            calcular_fertilizante_por_metro()
+    except Exception as e:
+        print(e)
+        sleep(1)
 
 def add_registro(_data):
     global REGISTROS
@@ -432,20 +481,22 @@ def add_registro(_data):
         print(e)
 
 def get_vetores():
+    global NUM_LINHAS, NUM_PLANTAS_LINHA
     try:
         if PLANTA_SELECIONADA and BASE > 0 and ALTURA > 0:
             _data = get_data().get("plantas").get(PLANTA_SELECIONADA)
             esp_l, esp_p = _data.get("esp_linha"), _data.get("esp_planta")
 
-            num_linhas = int(ALTURA // esp_l)
-            num_plantas_por_linha = int(BASE // esp_p)
-            x_vals = np.arange(0, num_plantas_por_linha + 1) * esp_p
-            y_vals = np.arange(0, num_linhas + 1) * esp_l
+            NUM_LINHAS = int(ALTURA // esp_l)
+            NUM_PLANTAS_LINHA = int(BASE // esp_p)
+            x_vals = np.arange(0, NUM_PLANTAS_LINHA + 1) * esp_p
+            y_vals = np.arange(0, NUM_LINHAS + 1) * esp_l
 
             x_items, y_items = np.meshgrid(x_vals, y_vals)  # shapes: (num_linhas, num_plantas_por_linha)
 
             graph_layout_data = np.column_stack((x_items.ravel(), y_items.ravel()))
             add_registro(graph_layout_data)
+            get_insumo_kg()
     except Exception as e:
         print(e)
 
@@ -483,6 +534,7 @@ def iniciar_calc():
             insumo = select_insumo(get_insumo=True)
             if insumo not in insumos and insumo is not None:
                 insumos.append(insumo)
+
             limpar_tela()
             if len(insumos) < len(get_data().get("insumos")):
                 print(f"\n------> Insumos Adicionados: {insumos} <--------")
@@ -493,8 +545,8 @@ def iniciar_calc():
             else:
                 break
 
+        INSUMOS_SELECIONADOS = insumos
         get_vetores()
-        input("\nPressione Enter para continuar...")
 
     except Exception as e:
         print(e)
@@ -503,7 +555,16 @@ def iniciar_calc():
 def select_registros():
     try:
         print(REGISTROS)
-        sleep(5)
+        print(NUM_LINHAS, NUM_PLANTAS_LINHA)
+        input("\nPressione Enter para continuar...")
+    except Exception as e:
+        print(e)
+
+def get_globals():
+    try:
+        print(BASE, ALTURA, PLANTA_SELECIONADA, INSUMOS_SELECIONADOS, INSUMOS_DATA, NUM_LINHAS, NUM_PLANTAS_LINHA)
+        calcular_fertilizante_por_metro()
+        input("\nPressione Enter para continuar...")
     except Exception as e:
         print(e)
 
@@ -516,6 +577,7 @@ def layout_menu():
             print(f"\n----MENU CÁLCULO--------------------\n\n1. Iniciar")
             if len(REGISTROS) > 0:
                 print(f"2. Resultados Anteriores")
+                print(f"3. Variáveis Globais")
             print(f"0. Voltar\n")
             response = input("Digite a opção: ")
 
@@ -526,6 +588,8 @@ def layout_menu():
                     iniciar_calc()
                 elif option == "2" and len(REGISTROS) > 0:
                     select_registros()
+                elif option == "3" and len(REGISTROS) > 0:
+                    get_globals()
                 elif option == "0":
                     break
             else:

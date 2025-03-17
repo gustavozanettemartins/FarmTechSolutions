@@ -12,9 +12,10 @@
         }
     },
     "insumos": {
-        "superfosfato": {
+        "superfosfato simples": {
             "comp": "P₂O₅",
             "quantidade": 0.18,
+            "densidade": 1.6,
             "min": {
                 "milho": 60,
                 "soja": 50
@@ -23,6 +24,7 @@
         "ureia": {
             "comp": "N",
             "quantidade": 0.45,
+            "densidade": 1.32,
             "min": {
                 "milho": 120,
                 "soja": 20
