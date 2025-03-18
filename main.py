@@ -15,6 +15,16 @@ NUM_LINHAS, NUM_PLANTAS_LINHA, QTD_PLANTAS = 0, 0, 0
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+def limpar_globals():
+    global BASE, ALTURA, PLANTA_SELECIONADA, INSUMOS_SELECIONADOS, INSUMOS_DATA, NUM_LINHAS, NUM_PLANTAS_LINHA, \
+        QTD_PLANTAS
+
+    BASE, ALTURA = 0, 0
+    PLANTA_SELECIONADA = None
+    INSUMOS_SELECIONADOS = list()
+    INSUMOS_DATA = dict()
+    NUM_LINHAS, NUM_PLANTAS_LINHA, QTD_PLANTAS = 0, 0, 0
+
 def add_planta():
     from data import adicionar_planta
 
@@ -530,6 +540,7 @@ def iniciar_calc():
         global BASE, ALTURA, PLANTA_SELECIONADA, INSUMOS_SELECIONADOS
 
         limpar_tela()
+        limpar_globals()
         print(f"\n----INICIAR CÁLCULO--------------------\n")
 
         base = input("Digite a base (m): ")
@@ -563,7 +574,7 @@ def iniciar_calc():
             limpar_tela()
             if len(insumos) < len(get_data().get("insumos")):
                 print(f"\n------> Insumos Adicionados: {insumos} <--------")
-                print("\nAdicionar mais insumos?\n\n1. Sim\n0. Não\n")
+                print("\nAdicionar mais insumos?\n1. Sim\n0. Não\n")
                 response = input("Digite a opção: ")
                 if response == "0":
                     break
@@ -604,14 +615,31 @@ def get_info_registro():
 
 def select_registros():
     try:
-        limpar_tela()
-        print("\n----------- REGISTROS ------------")
-        print(f"")
-        print(REGISTROS)
-        print(NUM_LINHAS, NUM_PLANTAS_LINHA)
+        plantas = list(REGISTROS.keys())
+        response = None
+        while True:
+            limpar_tela()
+            print("\n----------- REGISTROS ------------")
+            response = input(f"Qual plantas do registro? ({plantas})\nPlanta: ")
+            if response in plantas:
+                break
+
+        if response:
+            registros = REGISTROS.get(response)
+            options = list(registros.keys())
+
+            while True:
+                limpar_tela()
+                print(f"\n----------- REGISTROS {response.upper()} ------------")
+                response = input(f"Qual cálculo do registro? ({options})\nRegistro: ")
+                if int(response) in options:
+                    print(registros.get(int(response)))
+                    break
+
         input("\nPressione Enter para continuar...")
     except Exception as e:
         print(e)
+        sleep(1)
 
 def get_globals():
     try:
@@ -635,7 +663,6 @@ def layout_menu():
             print(f"\n----MENU CÁLCULO--------------------\n\n1. Iniciar")
             if len(REGISTROS) > 0:
                 print(f"2. Resultados Anteriores")
-                print(f"3. Variáveis Globais")
             print(f"0. Voltar\n")
             response = input("Digite a opção: ")
 
