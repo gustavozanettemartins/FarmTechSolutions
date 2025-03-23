@@ -1,6 +1,9 @@
 import os
 from time import sleep
 from datetime import datetime
+
+import pandas as pd
+
 from data import get_data, remover_planta, update_data
 from utils import extract_numbers
 import numpy as np
@@ -11,6 +14,7 @@ PLANTA_SELECIONADA = None
 INSUMOS_SELECIONADOS = list()
 INSUMOS_DATA = dict()
 NUM_LINHAS, NUM_PLANTAS_LINHA, QTD_PLANTAS = 0, 0, 0
+DF = None
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -516,7 +520,7 @@ def add_registro(_data):
         print(e)
 
 def get_vetores():
-    global NUM_LINHAS, NUM_PLANTAS_LINHA
+    global NUM_LINHAS, NUM_PLANTAS_LINHA, DF
     try:
         if PLANTA_SELECIONADA and BASE > 0 and ALTURA > 0:
             _data = get_data().get("plantas").get(PLANTA_SELECIONADA)
@@ -530,6 +534,8 @@ def get_vetores():
             x_items, y_items = np.meshgrid(x_vals, y_vals)  # shapes: (num_linhas, num_plantas_por_linha)
 
             graph_layout_data = np.column_stack((x_items.ravel(), y_items.ravel()))
+            DF = pd.DataFrame(graph_layout_data, columns=["x", "y"])
+
             add_registro(graph_layout_data)
             get_insumo_kg()
     except Exception as e:
@@ -588,9 +594,37 @@ def iniciar_calc():
         print(e)
         sleep(1)
 
+def export_csv():
+    # Criação do DataFrame com os dados fornecidos
+    custo_total = 0
+    for k, v in INSUMOS_DATA.items():
+        print(f"\n--> {k} <--")
+        print(f"kg/ha: {v["kg/ha"]}")
+        print(f"mL/m: {v["ml_por_metro_linear (mL/m)"]}")
+        print(f"Custo: R$ {v["custo"]:.2f}")
+        custo_total += v["custo"]
+
+    dados = {
+        'base': [BASE],
+        'altura': [ALTURA],
+        'area': [BASE * ALTURA],
+        'qtd_ruas': [NUM_LINHAS],
+        'qtd_plantas_por_rua': [NUM_PLANTAS_LINHA],
+        'qtd_plantas_total': [QTD_PLANTAS],
+        'custo_total': [custo_total]
+    }
+
+    df = pd.DataFrame(dados)
+
+    # Exporta o DataFrame para um arquivo CSV com delimitador ponto-e-vírgula
+    df.to_csv('dados.csv', index=False, sep=';', encoding='utf-8')
+
+    print("Arquivo CSV exportado com sucesso!")
+
 def get_info_registro():
+    global DF
+
     try:
-        limpar_tela()
         print("----------- INSUMOS UTILIZADOS ------------")
         custo_total = 0
         for k, v in INSUMOS_DATA.items():
@@ -608,7 +642,6 @@ def get_info_registro():
         print(f"Quantidade de plantas por rua: {NUM_PLANTAS_LINHA}")
         print(f"Quantidade de plantas total: {QTD_PLANTAS}")
         print(f"Custo Total: R$ {custo_total:.2f}")
-
         input("\nPressione Enter para continuar...")
     except Exception as e:
         print(e)
@@ -618,7 +651,8 @@ def select_registros():
         plantas = list(REGISTROS.keys())
         response = None
         while True:
-            limpar_tela()
+            # limpar_tela()
+            export_csv()
             print("\n----------- REGISTROS ------------")
             response = input(f"Qual plantas do registro? ({plantas})\nPlanta: ")
             if response in plantas:
@@ -629,11 +663,13 @@ def select_registros():
             options = list(registros.keys())
 
             while True:
-                limpar_tela()
+                # limpar_tela()
+
                 print(f"\n----------- REGISTROS {response.upper()} ------------")
                 response = input(f"Qual cálculo do registro? ({options})\nRegistro: ")
                 if int(response) in options:
                     print(registros.get(int(response)))
+                    get_info_registro()
                     break
 
         input("\nPressione Enter para continuar...")
@@ -659,7 +695,7 @@ def layout_menu():
 
     while True:
         try:
-            limpar_tela()
+            # limpar_tela()
             print(f"\n----MENU CÁLCULO--------------------\n\n1. Iniciar")
             if len(REGISTROS) > 0:
                 print(f"2. Resultados Anteriores")
