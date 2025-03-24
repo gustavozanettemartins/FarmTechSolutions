@@ -35,7 +35,9 @@ def adicionar_planta(name: str, values: dict):
     "esp_planta": float, "tipo_figura_geom": list).
     :return: None
     """
+    global DATA
     try:
+        print(values)
         if isinstance(name, str):
             if name not in DATA.get("plantas"):
                 DATA["plantas"][name] = values
@@ -55,6 +57,7 @@ def remover_planta(name: str):
     :param name: Nome da planta.
     :return: None
     """
+    global DATA
     try:
         if isinstance(name, str):
             if name in DATA.get("plantas"):
@@ -89,6 +92,7 @@ def adicionar_insumo(name: str, values: dict):
     "quantidade": float, "min": dict).
     :return: None
     """
+    global DATA
     try:
         if isinstance(name, str):
             if name not in DATA.get("insumos"):
@@ -109,6 +113,7 @@ def remover_insumo(name: str):
     :param name: Nome do insumo.
     :return: None
     """
+    global DATA
     try:
         if isinstance(name, str):
             if name in DATA.get("insumos"):

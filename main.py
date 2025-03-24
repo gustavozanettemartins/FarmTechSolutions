@@ -34,19 +34,23 @@ def add_planta():
 
     name = input("Digite o nome da planta, ou 0 para voltar: ").lower()
 
+    if get_data().get("plantas").get(name):
+        raise ValueError("Planta com este nome já existe")
+
     if name == "0":
         return
 
-    esp_linhas = input("Digite o espaçamento entre linhas: ")
-    esp_plantas = input("Digite o espaçamento entre plantas: ")
+    esp_linha = float(input("Digite o espaçamento entre linhas: "))
+    esp_planta = float(input("Digite o espaçamento entre plantas: "))
     tipo_figura_geom = input("Digite o tipo de figura geométrica: ")
-    values = {"esp_linhas": esp_linhas, "esp_plantas": esp_plantas, "tipo_figura_geom": [tipo_figura_geom]}
+    values = {"esp_linha": esp_linha, "esp_planta": esp_planta, "tipo_figura_geom": tipo_figura_geom}
 
     try:
         adicionar_planta(name, values)
         print(get_data())
     except Exception as e:
         print(e)
+        sleep(1)
 
 def rm_planta():
     try:
@@ -107,17 +111,11 @@ def edit_planta(name: str, planta: dict):
 
             elif response == "2":
                 value = input(f"Espaçamento entre linhas: ")
-                if extract_numbers(value).replace(" ", "").isnumeric():
-                    planta["esp_linha"] = float(extract_numbers(value))
-                else:
-                    raise ValueError("Precisa ser um número")
+                planta["esp_linha"] = float(value)
 
             elif response == "3":
                 value = input(f"Espaçamento entre plantas: ")
-                if extract_numbers(value).replace(" ", "").isnumeric():
-                    planta["esp_planta"] = float(extract_numbers(value))
-                else:
-                    raise ValueError("Precisa ser um número")
+                planta["esp_planta"] = float(value)
 
             elif response == "4":
                 value = input(f"Figura Geométrica(quadrado, retangulo ou triangulo): ")
@@ -651,7 +649,7 @@ def select_registros():
         plantas = list(REGISTROS.keys())
         response = None
         while True:
-            # limpar_tela()
+            limpar_tela()
             export_csv()
             print("\n----------- REGISTROS ------------")
             response = input(f"Qual plantas do registro? ({plantas})\nPlanta: ")
@@ -663,7 +661,7 @@ def select_registros():
             options = list(registros.keys())
 
             while True:
-                # limpar_tela()
+                limpar_tela()
 
                 print(f"\n----------- REGISTROS {response.upper()} ------------")
                 response = input(f"Qual cálculo do registro? ({options})\nRegistro: ")
@@ -695,7 +693,7 @@ def layout_menu():
 
     while True:
         try:
-            # limpar_tela()
+            limpar_tela()
             print(f"\n----MENU CÁLCULO--------------------\n\n1. Iniciar")
             if len(REGISTROS) > 0:
                 print(f"2. Resultados Anteriores")
@@ -761,4 +759,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

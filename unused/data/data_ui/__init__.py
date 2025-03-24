@@ -1,1 +1,0 @@
-from .window import Ui_FarmTechWindow
